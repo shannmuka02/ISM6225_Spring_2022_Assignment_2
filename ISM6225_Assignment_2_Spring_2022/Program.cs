@@ -9,13 +9,12 @@ WRITE YOUR CODE IN THE RESPECTIVE QUESTION FUNCTION BLOCK
 using System;
 using System.Collections.Generic;
 
-namespace ISM6225_Assignment_2_Spring_2022
+namespace Shannmuka
 {
     class Program
     {
         static void Main(string[] args)
         {
-
             //Question 1:
             Console.WriteLine("Question 1:");
             int[] nums1 = { 0, 1, 2, 3, 12 };
@@ -103,13 +102,13 @@ namespace ISM6225_Assignment_2_Spring_2022
 
             //Question 10:
             Console.WriteLine("Question 10");
-            string word1  = "horse";
+            string word1 = "horse";
             string word2 = "ros";
-            int minLen = MinDistance( word1,  word2);
+            int minLen = MinDistance(word1, word2);
             Console.WriteLine("Minimum number of operations required are {0}", minLen);
             Console.WriteLine();
         }
-    
+
 
         /*
         
@@ -132,8 +131,32 @@ namespace ISM6225_Assignment_2_Spring_2022
         {
             try
             {
-                //Write your Code here.
-                return -1;
+
+
+                int low, high;
+
+                low = 0;
+                high = nums.Length - 1;
+
+                int mid = (low + high) / 2;         // get the mid value
+                while (low <= high)
+                {       // run within low and high
+
+                    if (nums[mid] > target)          // our target is less than where we are, then search left 
+                        high = mid - 1;
+
+                    else if (nums[mid] < target)       // our target is greater than where we are, then search right 
+                        low = mid + 1;
+
+                    if (nums[mid] == target)         // return the mid when we found the target
+                        return mid;
+
+                    mid = (low + high) / 2;            // get the mid value
+                }
+                // if target not found, then return low/high based on where the mid is
+                if (target < nums[mid])
+                    return high;
+                return low;
             }
             catch (Exception)
             {
@@ -163,14 +186,44 @@ namespace ISM6225_Assignment_2_Spring_2022
         {
             try
             {
-                
-                //write your code here.
 
-                return "";
+                // trim string of punctuations. ALso make the paragraph lower case
+                paragraph = paragraph.Replace(".", "");
+                paragraph = paragraph.Replace(",", "");
+                paragraph = paragraph.ToLower();
+
+                string[] sa = paragraph.Split();                // split the string into string array
+
+
+                Dictionary<string, int> fd = new Dictionary<string, int>();         // dictionary with values as frequency and keys as strings
+
+                for (int i = 0; i < sa.Length; i++)
+                {
+                    if (Array.IndexOf(banned, sa[i]) == -1)
+                    {     // checks if the word is banned or not
+                        if (fd.ContainsKey(sa[i]) == true)
+                            fd[sa[i]] += 1;                                         // increment the frequency counter if presnet else, just add it.
+                        else
+                            fd.Add(sa[i], 1);
+                    }
+                }
+                string fin = "";
+                int maxcnter = -1;
+
+
+
+                foreach (KeyValuePair<string, int> temp in fd)
+                {         // iterate through the dictionary
+                    if (temp.Value >= maxcnter)
+                    {                        // if the curr value is greater than maxcnter then update it and fin
+                        fin = temp.Key;
+                        maxcnter = temp.Value;
+                    }
+                }
+                return fin;
             }
             catch (Exception)
             {
-
                 throw;
             }
         }
@@ -200,8 +253,37 @@ namespace ISM6225_Assignment_2_Spring_2022
         {
             try
             {
-                //write your code here.
-                return 0;
+
+                Dictionary<int, int> fd = new Dictionary<int, int>();   // dict for keeping track of frequency of numbers
+
+                for (int i = 0; i < arr.Length; i++)
+                {   // populate the dictionary
+
+                    if (fd.ContainsKey(arr[i]) == false)
+                    {
+                        fd.Add(arr[i], 1);
+                    }
+                    else
+                    {
+                        fd[arr[i]] += 1;
+                    }
+
+                }
+
+                int result = -1;
+
+
+                foreach (KeyValuePair<int, int> temp in fd)
+                {
+
+                    if (temp.Value == temp.Key)
+                    {         // if val and key match, its a lucky number 
+                        if (result < temp.Key)           // we check if it s greater than the one we already have and update it if needd
+                            result = temp.Key;
+                    }
+
+                }
+                return result;       // return the number
             }
             catch (Exception)
             {
@@ -235,8 +317,56 @@ namespace ISM6225_Assignment_2_Spring_2022
         {
             try
             {
-                //write your code here.
-                return "";
+                int length = secret.Length;
+
+
+                Dictionary<char, int> fd = new Dictionary<char, int>();  // frequency storing dictionary
+
+                for (int i = 0; i < length; i++)
+                {       // map the elements to their counts
+
+                    if (fd.ContainsKey(secret[i]) == false)
+                    {
+                        fd.Add(secret[i], 1);
+                    }
+                    else
+                    {
+                        fd[secret[i]] += 1;
+                    }
+
+                }
+
+                int b, c;
+                b = 0;
+                c = 0;
+
+                for (int i = 0; i < length; i++)
+                {           // this loop checks adn counts the bulls
+
+                    if (secret[i] == guess[i])
+                    {
+                        b++;
+                        fd[guess[i]] -= 1;          // decrement the freq in fd
+                    }
+                }
+
+                for (int i = 0; i < length; i++)
+                {             // this loop checks and counts the number of cows
+
+                    if (secret[i] != guess[i])
+                    {
+
+                        if (fd.ContainsKey(guess[i]) == true)
+                        {               // if char is present in secret but in wrong position in guess, then increment c
+                            if (fd[guess[i]] > 0)
+                                c++;
+                        }
+
+                    }
+                }
+                string bs = b.ToString() + "A";
+                string cs = c.ToString() + "B";
+                return bs + cs;
             }
             catch (Exception)
             {
@@ -265,9 +395,43 @@ namespace ISM6225_Assignment_2_Spring_2022
         {
             try
             {
-                //write your code here.
-                
-                return new List<int>() {} ;
+                List<int> final_list = new List<int>();
+                int len = s.Length;
+                int partition = 0;
+
+                Dictionary<char, int> fd = new Dictionary<char, int>();    // dictionary for storing last position of chars 
+
+                int last = 0;  // helps calculate size
+
+                for (int i = 0; i < len;)
+                {
+
+                    char starting = s[i];  // stores the starting char for this partittion
+
+                    for (int j = i; j < len; j++)
+                    {
+
+                        if (fd.ContainsKey(s[j]) == true)
+                        {
+                            if (fd[s[j]] <= partition || s[j] == starting)   // checks if the char already occured in this partition before,
+                                partition = j;        // extend the partition limit
+                            fd[s[j]] = j;
+                        }
+                        else
+                        {
+                            fd.Add(s[j], j);         // add to the dictionary
+                        }
+
+                    }
+                    int add = partition + 1;
+                    if (i != 0)
+                        add = add - last;           // calculates the size of the partition
+                    final_list.Add(add);                // add to the list final list
+                    i = partition + 1;                 // change the value of i to new partition's first index
+                    last = partition + 1;
+                }
+                return final_list;
+
             }
             catch (Exception)
             {
@@ -306,13 +470,32 @@ namespace ISM6225_Assignment_2_Spring_2022
 
          */
 
-        public static List<int> NumberOfLines(int[] widths,string s)
+        public static List<int> NumberOfLines(int[] widths, string s)
         {
             try
             {
-                //write your code here.
 
-                return new List<int>() { };
+                Dictionary<char, int> fd = new Dictionary<char, int>();      // dictionary for mapping letters to pixels
+
+                for (int i = 0; i < widths.Length; i++)      // populate the dictionary
+                    fd.Add((char)((int)'a' + i), widths[i]);
+
+
+                int val, lin;
+                val = lin = 0;
+                for (int i = 0; i < s.Length; i++)
+                {
+                    if (i == 0) lin++;
+                    if (val + fd[s[i]] > 100)
+                    {       // exceeding 100 pixels per line limit
+                        val = fd[s[i]];             // soo increment the line and just refill hte val
+                        lin++;
+                    }
+                    else
+                        val += fd[s[i]];	        // within limit, so just add it
+                }
+
+                return new List<int>() { lin, val };
             }
             catch (Exception)
             {
@@ -349,7 +532,36 @@ namespace ISM6225_Assignment_2_Spring_2022
         {
             try
             {
-                //write your code here.
+
+                int len = bulls_string10.Length;
+                // these variables keep track of the opening and closing brackets incrementing when open, decrementing when close
+                int v1, v2, v3;
+                v1 = 0;
+                v2 = 0;
+                v3 = 0;
+
+                // if we come across an open bracket, then increment the counter, or else just decrement. IF at end, the value is 0, then it's balanced
+
+                for (int i = 0; i < len; i++)
+                {
+                    if (bulls_string10[i] == '(')            // increment
+                        v1++;
+                    else if (bulls_string10[i] == ')')       // decrement
+                        v1--;
+                    else if (bulls_string10[i] == '[')           // increment
+                        v2++;
+                    else if (bulls_string10[i] == ']')           // ddecrement
+                        v2--;
+                    else if (bulls_string10[i] == '{')           // increment
+                        v3++;
+                    else if (bulls_string10[i] == '}')       // decremtn
+                        v3--;
+                }
+
+                if (v3 == 0 && v1 == 0 && v2 == 0)
+                {       // if all vals are 0, then the string is valid or else invalid 
+                    return true;
+                }
 
                 return false;
             }
@@ -392,9 +604,45 @@ namespace ISM6225_Assignment_2_Spring_2022
         {
             try
             {
-                //write your code here.
 
-                return 0;
+                // write the morse codes for all letters
+                string[] mco = { ".-", "-...", "-.-.", "-..", ".", "..-.", "--.", "....", "..", ".---", "-.-", ".-..", "--", "-.", "---", ".--.", "--.-", ".-.", "...", "-", "..-", "...-", ".--", "-..-", "-.--", "--.." };
+
+
+
+                Dictionary<char, string> md = new Dictionary<char, string>();      // dictionary for mapping chars to morse codees
+
+                for (int i = 0; i < mco.Length; i++)
+                {     // populate the dictionary
+                    md.Add((char)((int)'a' + i), mco[i]);
+                }
+
+
+                // dict for uniq morse codes
+
+                Dictionary<string, int> nd = new Dictionary<string, int>();
+
+
+                for (int i = 0; i < words.Length; i++)
+                {
+
+                    string word = words[i].ToLower();   // lowercase
+
+
+                    string temp = "";
+
+                    for (int j = 0; j < word.Length; j++)    // get the morse code for the final word using individual chars
+                        temp += md[word[j]];
+
+
+                    if (nd.ContainsKey(temp) == true)        // nd keeps track of all the morse codes and the keys of nd give the transformations
+                        nd[temp] += 1;
+                    else
+                        nd.Add(temp, 1);
+
+                }
+
+                return nd.Count;  // count return the numbr of keys
             }
             catch (Exception)
             {
@@ -403,7 +651,7 @@ namespace ISM6225_Assignment_2_Spring_2022
 
         }
 
-      
+
 
 
         /*
@@ -425,12 +673,76 @@ namespace ISM6225_Assignment_2_Spring_2022
         {
             try
             {
-                //write your code here.
-                return 0;
+                // Approach : Binary search + BFS
+
+                int n = grid.Length; // get the length of the grid (n x n) 
+                int size = (int)Math.Sqrt(n);  // get n 
+                int first, last;        // define variables for binary searching the values in the grid: boundaries
+                first = grid[0, 0];         // the low value is the starting value
+                last = (size * size) - 1;             // the high value is the highest val possible in the grid
+                int result = -1;            // result variable for finally storing the result
+                while (first <= last)
+                {          // start binary seach
+                    int mid = (first + last) / 2;   // get the mid val
+                    bool ispath = false;        // declare a var for knowing whether there will be a path from (0,0) to (n-1,n-1) with the current mid as depth
+
+                    int[] a = new int[2] { -0, -1 };   // initializing the possible directions we can traverse: up, down, left, right
+                    int[] b = new int[2] { 1, 0 };
+                    int[] c = new int[2] { 0, 1 };
+                    int[] ds = new int[2] { -1, 0 };
+                    int[][] dir = new int[][] { a, b, c, ds };  // store them in a jagged array (but uniform in this case)
+                    Queue<Tuple<int, int>> points_q = new Queue<Tuple<int, int>>();  // declare a tuple queue for storing neighbouring points when we perform BFS
+                    points_q.Enqueue(Tuple.Create(0, 0));        // first point being the grid[0][0]
+                    bool[][] visited = new bool[size][];       // declare visited array
+                    for (int i = 0; i < size; i++)
+                        visited[i] = new bool[size];
+                    visited[0][0] = true;       // make first node visited
+                    int f = 0;          // flag for when to break out of loop :  0 - path not found,  1 - because, path found
+                    while (points_q.Count > 0)
+                    {          // while the queue has neighbours
+                        int neighbours = points_q.Count;
+                        for (int i = 0; i < neighbours; i++)
+                        {       // for all neighbours 
+                            var pnt = points_q.Dequeue();       // pop the next point
+                            int X = pnt.Item1;          // get the co-ordinates
+                            int Y = pnt.Item2;
+
+                            if (X == size - 1 && Y == size - 1)
+                            {  // if we reach the end point, then make ispath true and f=1, and break;
+                                ispath = true;
+                                //Console.WriteLine("SD");
+                                f = 1;
+                                break;
+                            }
+                            foreach (var d in dir)
+                            {   // add the neighbours in all respective directions to the queue
+                                int nX = X + d[0];
+                                int nY = Y + d[1];
+                                if (nX >= 0 && nX < size && nY >= 0 && nY < size && !visited[nX][nY] && grid[nX, nY] <= mid)
+                                {  // boundary conditions, check if already visited, and make sure the next nodes' height atmost mid:(depth)
+                                    points_q.Enqueue(Tuple.Create(nX, nY));  // add to queue
+                                    visited[nX][nY] = true;     // make it visited
+                                }
+                            }
+                        }
+                        if (f == 1)      // if we break out due to path being found
+                            break;
+                    }
+                    if (f == 0)            // meaning: path not found
+                        ispath = false;
+
+                    if (ispath)
+                    {   // path found case:
+                        result = mid;           // store the current depth in result
+                        last = mid - 1;         // for checking if any other depth which is minimum has path. : so trim the search space acc. to binary search
+                    }
+                    else            // path not found case:
+                        first = mid + 1;        // trim the search space
+                }
+                return result;
             }
             catch (Exception)
             {
-
                 throw;
             }
         }
@@ -460,9 +772,32 @@ namespace ISM6225_Assignment_2_Spring_2022
         {
             try
             {
-                //write your code here.
-                return 0;
+                int wl1 = word1.Length;                    // get respective lengths
+                int wl2 = word2.Length;
+                //Dynamic programming : bottom up approach
 
+                int[,] dp = new int[wl1 + 1, wl2 + 1];
+
+                for (int i = 0; i <= wl1; i++)
+                {              // this loop and the inner loop start filling the DP array from bottom up
+
+                    for (int j = 0; j <= wl2; j++)
+                    {
+
+                        if (i == 0 && j == 0)            // case 1 : i=0,j=0 meaning string lens are 0, so dp[i,j] = 0
+                            dp[i, j] = 0;
+                        else if (i == 0)                 // case 2 : i = 0 meaning j insert operations min req for changing w1 to w2
+                            dp[i, j] = j;
+                        else if (j == 0)                 // case 3 : j = 0 meaning i remove operations min req for changing w1 to w2
+                            dp[i, j] = i;
+                        else if (word1[i - 1] == word2[j - 1])  // case 4: if last chars same, then meaning dp[i-1,j-1]
+                            dp[i, j] = dp[i - 1, j - 1];
+                        else                               //case 5: get the minimum value from doing all the three ops on word1 for i,j
+                            dp[i, j] = 1 + Math.Min(dp[i - 1, j], Math.Min(dp[i - 1, j - 1], dp[i - 1, j]));
+                    }
+                }
+                // return the respective min operations for word1 and word2
+                return dp[wl1, wl2];
             }
             catch (Exception)
             {
